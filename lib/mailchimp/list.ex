@@ -65,6 +65,29 @@ defmodule Mailchimp.List do
     member
   end
 
+  def remove_member(%__MODULE__{links: %{"members" => %Link{href: href}}}, email) do
+    subscriber_id = email
+    |> String.downcase
+    |> md5
+
+    {:ok, response} = HTTPClient.delete(href <> "/#{subscriber_id}")
+    case response do
+      %Response{status_code: 200, body: body} ->
+        {:ok, Member.new(body)}
+
+      %Response{status_code: 204, body: body} ->
+        {:ok, Member.new(body)}
+
+      %Response{status_code: _, body: body} ->
+        {:error, body}
+    end
+  end
+
+  def remove_member!(list, email) do
+    {:ok, member} = remove_member(list, email)
+    member
+  end
+
   def interest_categories(%__MODULE__{links: %{"interest-categories" => %Link{href: href}}}) do
     {:ok, response} = HTTPClient.get(href)
     case response do
