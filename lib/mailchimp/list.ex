@@ -73,10 +73,10 @@ defmodule Mailchimp.List do
     {:ok, response} = HTTPClient.delete(href <> "/#{subscriber_id}")
     case response do
       %Response{status_code: 200, body: body} ->
-        {:ok, Member.new(body)}
+        {:ok, body}
 
       %Response{status_code: 204, body: body} ->
-        {:ok, Member.new(body)}
+        {:ok, body}
 
       %Response{status_code: _, body: body} ->
         {:error, body}
